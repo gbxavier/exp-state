@@ -3,9 +3,13 @@ const Redis = require("ioredis");
 
 const app = express();
 
-const port = process.env.PORT || 3000;
-
 app.use(express.static("public"));
+
+/**
+ * Redis connection setup
+ * If you are running Redis locally, no need to set any env variables (Defaults will be used).
+ * Otherwise, set the REDIS_HOST and REDIS_PORT accordingly.
+ */
 
 var redisHost = process.env.REDIS_HOST || "127.0.0.1";
 var redisPort = process.env.REDIS_PORT || "6379";
@@ -49,6 +53,4 @@ app.post("/nuke", async (req, res) => {
   res.send({ status: "completed" });
 });
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+module.exports = app;

@@ -3,10 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "node ./app"
+    "start": "node ./server.js",
+    "test": "jest"
   },
   "dependencies": {
     "express": "~4.16.1",
     "ioredis": "^5.8.1"
+  },
+  "devDependencies": {
+    "ioredis-mock": "^8.13.0",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4"
   }
 }
