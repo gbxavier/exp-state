@@ -1,33 +1,54 @@
-var createError = require("http-errors");
-var express = require("express");
-var path = require("path");
-var logger = require("morgan");
+const express = require("express");
+const Redis = require("ioredis");
 
-var indexRouter = require("./routes/index");
+const app = express();
 
-var app = express();
+const port = process.env.PORT || 3000;
 
-app.use(logger("dev"));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
 app.use(express.static("public"));
 
-app.use("/", indexRouter);
+var redisHost = process.env.REDIS_HOST || "127.0.0.1";
+var redisPort = process.env.REDIS_PORT || "6379";
 
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
+const redisClient = new Redis({
+  host: redisHost,
+  port: redisPort,
 });
 
-// error handler
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get("env") === "development" ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.send("error");
+app.get("/", async (req, res) => {
+  const visits = await redisClient.incr("visits");
+  console.log("Received a request");
+  res.send(`<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Counter with Redis</title>
+  </head>
+  <body>
+    <h1>Counter: <span id="counter">${visits}</span></h1>
+    <button id="nukebtn">Nuke this counter!</button>
+  </body>
+  <script>
+    function fetchNuke() {
+      document.getElementById('nukebtn').addEventListener('click', () => {
+        fetch('/nuke', { method: 'POST' })
+          .then(res => {
+              console.log('Counter nuked.');
+              document.getElementById('counter').textContent = '0';
+          }).catch(err => console.error('Error nuking counter:', err));
+      });
+    };
+    fetchNuke();
+  </script>
+</html>`);
 });
 
-module.exports = app;
+app.post("/nuke", async (req, res) => {
+  await redisClient.set("visits", 0);
+  console.log("Nuked visit count");
+  res.send({ status: "completed" });
+});
+
+app.listen(port, () => {
+  console.log(`Server is running on http://localhost:${port}`);
+});
