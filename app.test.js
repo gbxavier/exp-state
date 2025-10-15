@@ -10,7 +10,7 @@ const app = require("./app");
 
 describe("Test Counter Logic", () => {
   afterEach(async () => {
-    await st(app).post("/nuke"); // TODO: Improve flush logic
+    await mockRedis().set("visits", 0); // Reset counter before test
     jest.resetModules();
     jest.restoreAllMocks();
   });
