@@ -10,7 +10,7 @@ const app = require("./app");
 
 describe("Test Counter Logic", () => {
   beforeEach(async () => {
-    await mockRedis().set("visits", 0); // Reset counter before test
+    await mockRedis().set("visits", 0); // Reset counter
   });
 
   afterEach(async () => {
@@ -19,31 +19,21 @@ describe("Test Counter Logic", () => {
   });
 
   it("should increment counter", async () => {
-    const response = await st(app).get("/");
-    expect(response.statusCode).toBe(200);
-    expect(response.text).toContain("Counter:");
-    expect(response.text).toContain('id="counter">1'); // Should contain the mocked counter value
+    const rIncr = await st(app).get("/");
+    expect(rIncr.statusCode).toBe(200);
+    expect(rIncr.text).toContain("Counter:");
+    expect(rIncr.text).toContain('id="counter">1'); // Should contain the mocked value
   });
 
   it("should nuke counter", async () => {
-    const response1 = await st(app).get("/");
-    expect(response1.statusCode).toBe(200);
-    expect(response1.text).toContain('id="counter">1');
+    await mockRedis().set("visits", 4); // Set initial state
 
-    const response2 = await st(app).get("/");
-    expect(response2.statusCode).toBe(200);
-    expect(response2.text).toContain('id="counter">2');
+    const rNuke = await st(app).post("/nuke");
+    expect(rNuke.statusCode).toBe(200);
+    expect(rNuke.body).toEqual({ status: "completed" });
 
-    const response3 = await st(app).get("/");
-    expect(response3.statusCode).toBe(200);
-    expect(response3.text).toContain('id="counter">3');
-
-    const response4 = await st(app).post("/nuke");
-    expect(response4.statusCode).toBe(200);
-    expect(response4.body).toEqual({ status: "completed" });
-
-    const response = await st(app).get("/");
-    expect(response.statusCode).toBe(200);
-    expect(response.text).toContain('id="counter">1');
+    const rCheck = await st(app).get("/");
+    expect(rCheck.statusCode).toBe(200);
+    expect(rCheck.text).toContain('id="counter">1');
   });
 });
