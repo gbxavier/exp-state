@@ -9,8 +9,11 @@ jest.mock("ioredis", () => mockRedis);
 const app = require("./app");
 
 describe("Test Counter Logic", () => {
-  afterEach(async () => {
+  beforeEach(async () => {
     await mockRedis().set("visits", 0); // Reset counter before test
+  });
+
+  afterEach(async () => {
     jest.resetModules();
     jest.restoreAllMocks();
   });
