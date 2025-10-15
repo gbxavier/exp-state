@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
         - name: exp-state-container
-          image: exp-state:0.1.0
+          image: exp-state:0.1.1
           imagePullPolicy: IfNotPresent
           ports:
             - name: http

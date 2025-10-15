@@ -20,8 +20,11 @@ const redisClient = new Redis({
 });
 
 app.get("/", async (req, res) => {
+  if (req.get("User-Agent").includes("kube-probe")) {
+    return res.status(200).send("OK");
+  }
+  // TODO: Add logging here
   const visits = await redisClient.incr("visits");
-  console.log("Received a request");
   res.send(`<html lang="en">
   <head>
     <meta charset="UTF-8" />
