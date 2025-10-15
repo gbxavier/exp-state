@@ -1,0 +1,32 @@
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: exp-state
+  labels:
+    app.kubernetes.io/name: exp-state
+    app.kubernetes.io/instance: exp-state
+    app.kubernetes.io/version: "0.1.0"
+    app.kubernetes.io/component: service
+    app.kubernetes.io/part-of: test-system
+    app.kubernetes.io/managed-by: manual
+    owner: exp-state
+spec:
+  maxReplicas: 10
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: exp-state
+  metrics:
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          averageUtilization: 70
+          type: Utilization
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          averageUtilization: 70
+          type: Utilization
