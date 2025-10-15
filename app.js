@@ -12,7 +12,7 @@ app.use(express.static("public"));
  */
 
 var redisHost = process.env.REDIS_HOST || "127.0.0.1";
-var redisPort = process.env.REDIS_PORT || "6379";
+var redisPort = process.env.REDIS_PORT || 6379;
 
 const redisClient = new Redis({
   host: redisHost,
